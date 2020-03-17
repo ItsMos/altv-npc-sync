@@ -1,4 +1,3 @@
-import alt from 'alt-client'
 import game from 'natives'
 
 export function inFrontOf(pos, heading, dist) {
@@ -8,15 +7,6 @@ export function inFrontOf(pos, heading, dist) {
   pos.y += (dist * Math.cos(-heading))
   return pos
 }
-
-export function notify(txt, color = 2, blink = false) {
-  game.beginTextCommandThefeedPost("CELL_EMAIL_BCON")
-  game.addTextComponentSubstringPlayerName(txt)
-  game.thefeedSetNextPostBackgroundColor(color)
-  game.endTextCommandThefeedPostTicker(blink, false)
-}
-
-alt.onServer('notify', (...args) => notify(...args))
 
 export function drawText(text, x,y, scale, fontType, r, g, b, a, useOutline = true, useDropShadow = true) {
   game.setTextFont(fontType)
@@ -41,16 +31,4 @@ export function drawText(text, x,y, scale, fontType, r, g, b, a, useOutline = tr
     game.addTextComponentSubstringPlayerName(textBlock)
   })
   game.endTextCommandDisplayText(x, y, 0.0)
-}
-
-export function repeatUntil(fn) {
-  return new Promise((resolve, reject) => {
-    let interval = alt.setInterval(()=> {
-      let result = fn()
-      if (result) {
-        alt.clearInterval(interval)
-        resolve(result)
-      }
-    }, 500)
-  })
 }

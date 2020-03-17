@@ -1,2 +1,2 @@
 # npc-sync
-###### adds the ability to create server-side peds for alt:V
+###### adds synced peds that are controlled by clients for alt:V

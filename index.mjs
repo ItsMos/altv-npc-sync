@@ -1,10 +1,10 @@
 import alt from 'alt-server'
-import { distance, forEachInRange } from './util'
+import { forEachInRange } from './util'
 import chat from 'chat'
 
 let npcs = {}
-class npc {
-  constructor(model, pos = {x:20}, rot, controllerID) {
+export class npc {
+  constructor(model, pos, rot, controllerID) {
     this.id = npc.generateID()
     this.model = model
     this.pos = {
@@ -16,24 +16,32 @@ class npc {
     this.controllerID = controllerID
     
     forEachInRange(pos, 500, player => {
-      if (player.id == controllerID) {
-        player.setSyncedMeta('npc:'+this.id, ent)
-      }
       alt.emitClient(player, 'npc:spawn', this)
     })
     return npcs[this.id] = this
   }
 
   static generateID() {
-    let str = ''
-    for (let i = 0; i < 5; i++)
-      str += String.fromCharCode(Math.floor(Math.random() * (125 - 64) + 64))
-    return str
+    for (let id = 0; ; id++)
+      if (!npcs[id])
+        return id
   }
 }
+
+alt.onClient('npc:update', (player, _npc) => {
+  let ped = npcs[_npc.id]
+  if (ped) {
+    Object.assign(ped, _npc)
+
+    forEachInRange(ped.pos, 500, _player=> {
+      if (player.id != _player.id) {
+        alt.emitClient(_player, 'npc:update', _npc)
+      }
+    })
+  }
+})
 
 chat.registerCmd('ped', (player)=> {
   let pos = player.pos
   let ent = new npc('player_one', pos, 0, player.id)
-  console.log(ent.model, ent.id)
 })
